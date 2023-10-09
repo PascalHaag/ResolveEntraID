@@ -77,6 +77,7 @@
 
             The function will also write the result in the cache (IdNameMappingTable), if NoCache isn't set.
             #>
+            [OutputType([string])]
             [CmdletBinding()]
             param (
                 [string]
@@ -126,7 +127,7 @@
             foreach ($providerName in $Provider) {
                 $providerObject = $script:IdentityProvider[$providerName]
                 if (-not $providerObject) {
-                    Write-PSFMessage -Level Error -Message "Could not find identity provider {0}. Please register or check the spelling of the provider. Known providers: {1}" -StringValues $providerName, ((Get-MeidIdentityProvider).Name -join ", ") -Target $providerName 
+                    Write-PSFMessage -Level Error -Message "Could not find identity provider {0}. Please register or check the spelling of the provider. Known providers: {1}" -StringValues $providerName, ((Get-MeidIdentityProvider).Name -join ", ") -Target $providerName
                     continue
                 }
                 try {
@@ -137,7 +138,7 @@
                         if (-not $resolvedName) { continue }
                         break
                     }
-                    if (-not $resolvedName) { 
+                    if (-not $resolvedName) {
                         $resolvedName = $entry
                         Write-PSFMessage -Level SomewhatVerbose -Message "{0} of type {1} could be found but failed to resolve the {2}." -StringValues $entry, $providerName, ($providerObject.NameProperty -join ", ") -Target $entry -Tag $providerName
                     }

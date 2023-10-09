@@ -23,7 +23,7 @@
     param (
         [PSFArgumentCompleter("ResolveEntraID.Provider")]
         [string]
-        $Name = '*' 
+        $Name = '*'
     )
     process {
         $script:IdentityProvider.Values | Where-Object Name -like $Name
