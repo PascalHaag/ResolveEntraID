@@ -39,7 +39,7 @@
     The written output is ID, Name (Property), Provider and the result will NOT be written in the cache.
 
     .EXAMPLE
-    PS C:\> Resolve-MeidIdentity -ID "xyz","abc" -Provider UserUPN,Group -NoCache
+    PS C:\> Resolve-MeidIdentity -ID "xyz","abc" -Provider UserUPN,Group -NoCache -NameOnly
 
     Will resolve the IDs "xyz" and "abc" with defined property in the providers "UserUPN" and "Group".
     The written output is only Name (Property) and the result will NOT be written in the cache.
@@ -47,6 +47,8 @@
     [CmdletBinding()]
     param (
         [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [AllowEmptyCollection()]
+        [AllowNull()]
         [string[]]
         $Id,
 

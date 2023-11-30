@@ -4,7 +4,7 @@
 
 Welcome to the module toolkit designed to resolve IDs in Entra ID to needed properties.
 If you want to export the name of users, groups, applications or all other things in Entra ID, but you have only the IDs of these?
-Just use this module, it will help you to resolbe the IDs to properties that YOU want!  
+Just use this module, it will help you to resolve the IDs to properties that YOU want!  
 
 ## Installing
 
@@ -19,6 +19,13 @@ Install-Module ResolveEntraID -Scope CurrentUser
 ```powershell
 #  Register a provider with name "UserUPN", the property to search for "userPrincipalName" with the query "users".
 Register-MeidIdentityProvider -Name "UserUPN" -NameProperty "userPrincipalName" -Query "users"
+```
+
+## Unregister Identity Provider
+
+```powershell
+# Unregister a provider with name "UserUPN" and clear cache of the "UserUPN" provider.
+Unregister-MeidIdentityProvider -Name "UserUPN"
 ```
 
 ## Get Identity Provider
@@ -46,8 +53,12 @@ Resolve-MeidIdentity -ID "xyz","abc" -Provider UserUPN,Group
 # Clears the Entra ID identiy cache.
 Clear-MeidIdentityCache
 ```
+```powershell
+# Clears the Entra ID identiy cache of provider "UserUPN".
+Clear-MeidIdentityCache -ProviderName "UserUPN"
+```
 
-## Registered Provider by Default
+## Registered Provider by default
 
 | Name        | Property          | Query        |
 | ----------- | ----------------- | ------------ |
