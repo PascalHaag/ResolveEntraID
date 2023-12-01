@@ -148,7 +148,7 @@
                     continue main
                 }
                 catch {
-                    if ($_.ErrorDetails.Message -match '"code":"Request_ResourceNotFound"') {
+                    if ($_.ErrorDetails.Message -match '"code":\s*"Request_ResourceNotFound"') {
                         Write-PSFMessage -Level InternalComment -Message "ID {0} could not found as {1}." -StringValues $entry, $providerName -Target $entry -Tag $providerName -ErrorRecord $_ -OverrideExceptionMessage
                         continue
                     }
