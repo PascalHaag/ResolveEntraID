@@ -1,4 +1,4 @@
-﻿function Unregister-MeidIdentityProvider {
+﻿function Unregister-REntraIdentityProvider {
     <#
     .SYNOPSIS
     Unregister Entra ID identity provider.
@@ -29,7 +29,7 @@
     )
     process {
         foreach ($entry in $ProviderName ){
-            Clear-MeidIdentityCache -Provider $entry
+            Clear-REntraIdentityCache -Provider $entry
             $script:IdentityProvider.Remove($entry)
         }
     }

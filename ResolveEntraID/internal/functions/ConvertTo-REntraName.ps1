@@ -1,4 +1,4 @@
-﻿function Resolve-MeidIdentity {
+﻿function ConvertFrom-REntraGUIDToName {
     <#
     .SYNOPSIS
     Resolve Entra ID identity.
@@ -50,7 +50,7 @@
         [AllowEmptyCollection()]
         [AllowNull()]
         [string[]]
-        $Id,
+        $Identity,
 
         [Parameter(Mandatory)]
         [PSFArgumentCompleter("ResolveEntraID.Provider")]
@@ -59,10 +59,7 @@
         $Provider,
 
         [switch]
-        $NoCache,
-
-        [switch]
-        $NameOnly
+        $NoCache
     )
     begin {
         function Write-Result {
@@ -114,8 +111,8 @@
         }
     }
     process {
-        :main foreach ($entry in $Id) {
-            if ($entry -notmatch '^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$') {
+        :main foreach ($entry in $Identity) {
+			if ($entry -notmatch '^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$') {
                 $entry
                 continue
             }
@@ -129,11 +126,11 @@
             foreach ($providerName in $Provider) {
                 $providerObject = $script:IdentityProvider[$providerName]
                 if (-not $providerObject) {
-                    Write-PSFMessage -Level Error -Message "Could not find identity provider {0}. Please register or check the spelling of the provider. Known providers: {1}" -StringValues $providerName, ((Get-MeidIdentityProvider).Name -join ", ") -Target $providerName
+                    Write-PSFMessage -Level Error -Message "Could not find identity provider {0}. Please register or check the spelling of the provider. Known providers: {1}" -StringValues $providerName, ((Get-REntraIdentityProvider).Name -join ", ") -Target $providerName
                     continue
                 }
                 try {
-                    $graphResponse = MiniGraph\Invoke-GraphRequest -Query ($providerObject.Query -f $entry) -ErrorAction Stop
+                    $graphResponse = MiniGraph\Invoke-GraphRequest -Query ($providerObject.QueryToGetName -f $entry) -ErrorAction Stop
                     if (-not $graphResponse) { continue }
                     foreach ($propertyName in $providerObject.NameProperty) {
                         $resolvedName = $graphResponse.$propertyName

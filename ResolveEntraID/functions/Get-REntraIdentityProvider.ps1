@@ -1,4 +1,4 @@
-﻿function Get-MeidIdentityProvider {
+﻿function Get-REntraIdentityProvider {
     <#
     .SYNOPSIS
     Get registered Entra ID identity provider.
@@ -15,7 +15,7 @@
     Get all registered Microsoft Entra ID identity provider.
     
     .EXAMPLE
-    PS C:\> Get-MeidIdentityProvider -Name "*User*"
+    PS C:\> Get-MeidIdentityProvider -ProviderName "*User*"
 
     Get registered Microsoft Entra ID identity provider where name like "*User*".
     #>
@@ -23,9 +23,9 @@
     param (
         [PSFArgumentCompleter("ResolveEntraID.Provider")]
         [string]
-        $Name = '*'
+        $ProviderName = '*'
     )
     process {
-        $script:IdentityProvider.Values | Where-Object Name -like $Name
+        $script:IdentityProvider.Values | Where-Object Name -like $ProviderName
     }
 }

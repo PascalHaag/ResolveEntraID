@@ -1,6 +1,7 @@
 ﻿$param = @{
-    Name = "Group"
+    ProviderName = "Group"
     NameProperty = "displayName"
-    Query = "groups/{0}"
+    QueryByName = "groups/{0}"
+	QueryByGUID = "groups/{0}"
 }
-Register-MeidIdentityProvider @param
+Register-REntraIdentityProvider @param

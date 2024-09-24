@@ -1,6 +1,7 @@
 ﻿$param = @{
-    Name = "User"
+    ProviderName = "User"
     NameProperty = "userPrincipalName"
-    Query = "users/{0}"
+    QueryByName = "users/{0}"
+	QueryByGUID = "users/{0}"
 }
-Register-MeidIdentityProvider @param
+Register-REntraIdentityProvider @param

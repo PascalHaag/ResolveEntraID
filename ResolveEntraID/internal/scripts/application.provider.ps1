@@ -1,6 +1,7 @@
 ﻿$param = @{
-    Name = "Application"
+	ProviderName = "Application"
     NameProperty = "displayName"
-    Query = "applications/{0}"
+    QueryByName = "applications/{0}"
+	QueryByGUID = "applications/{0}"
 }
-Register-MeidIdentityProvider @param
+Register-REntraIdentityProvider @param

@@ -1,4 +1,4 @@
-﻿function Clear-MeidIdentityCache {
+﻿function Clear-REntraIdentityCache {
     <#
     .SYNOPSIS
     Clears the Entra ID identiy cache.
