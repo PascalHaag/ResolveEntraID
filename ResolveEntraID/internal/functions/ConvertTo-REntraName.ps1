@@ -1,72 +1,66 @@
-﻿function ConvertFrom-REntraGUIDToName {
-    <#
+﻿function ConvertTo-REntraName {
+	<#
     .SYNOPSIS
-    Resolve Entra ID identity.
-    
-    .DESCRIPTION
-    Resolve Microsoft Entra ID identity.
-    This function will resolve an ID to a user defined property.
-    Requires an active connection to Azure with MiniGraph.
-    
-    .PARAMETER Id
-    ID(s) that should be resolved by the function.
-    
-    .PARAMETER Provider
-    Provider(s) that should be used to resolve the ID(s).
-    
-    .PARAMETER NoCache
-    Option that no Cache will be created. ID(s) with the mapping property will not be cached.
-    
-    .PARAMETER NameOnly
-    Option that only show the resolved name.
-    
-    .EXAMPLE
-    PS C:\> Resolve-MeidIdentity -ID "xyz" -Provider UserUPN
+	Convert a GUID to a user defined property.
 
-    Will resolve the ID "xyz" with defined property in the provider "UserUPN".
-    The written output is ID, Name (Property), Provider and the result will be written in the cache.
-    
-    .EXAMPLE
-    PS C:\> Resolve-MeidIdentity -ID "xyz","abc" -Provider UserUPN,Group
+	.DESCRIPTION
+	Convert a GUID to a user defined property. If the GUID is already a user defined property, it will be returned as is.
 
-    Will resolve the IDs "xyz" and "abc" with defined property in the providers "UserUPN" and "Group".
-    The written output is ID, Name (Property), Provider and the result will be written in the cache.
+	.PARAMETER Identity
+	The GUID to convert to a user defined property.
 
-    .EXAMPLE
-    PS C:\> Resolve-MeidIdentity -ID "xyz","abc" -Provider UserUPN,Group -NoCache
+	.PARAMETER Provider
+	The provider to use for the conversion.
 
-    Will resolve the IDs "xyz" and "abc" with defined property in the providers "UserUPN" and "Group".
-    The written output is ID, Name (Property), Provider and the result will NOT be written in the cache.
+	.PARAMETER NoCache
+	Option that no Cache will be created. ID(s) with the mapping property will not be cached.
 
-    .EXAMPLE
-    PS C:\> Resolve-MeidIdentity -ID "xyz","abc" -Provider UserUPN,Group -NoCache -NameOnly
+	.EXAMPLE
+	PS C:\> ConvertTo-REntraName -Identity "<GUID>" -Provider UserUPN
 
-    Will resolve the IDs "xyz" and "abc" with defined property in the providers "UserUPN" and "Group".
-    The written output is only Name (Property) and the result will NOT be written in the cache.
+	Will convert the GUID "<GUID>" to a user defined property using the provider "UserUPN".
+
+	.EXAMPLE
+	PS C:\> ConvertTo-REntraName -Identity "<GUID>" -Provider UserUPN -NoCache
+
+	Will convert the GUID "<GUID>" to a user defined property using the provider "UserUPN" and not cache the result.
+
+	.EXAMPLE
+	PS C:\> "<GUID>" | ConvertTo-REntraName -Provider UserUPN
+
+	Will convert the GUID "<GUID>" to a user defined property using the provider "UserUPN".
+
+	.EXAMPLE
+	PS C:\> ConvertTo-REntraName -Identity "<GUID>" -Provider UserUPN -NameOnly
+
+	Will convert the GUID "<GUID>" to a user defined property using the provider "UserUPN" and only return the user defined property.
     #>
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-        [AllowEmptyCollection()]
-        [AllowNull()]
-        [string[]]
-        $Identity,
+	[CmdletBinding()]
+	param (
+		[Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+		[AllowEmptyCollection()]
+		[AllowNull()]
+		[string[]]
+		$Identity,
 
-        [Parameter(Mandatory)]
-        [PSFArgumentCompleter("ResolveEntraID.Provider")]
-        [PSFValidateSet(TabCompletion = "ResolveEntraID.Provider")]
-        [string[]]
-        $Provider,
+		[Parameter(Mandatory)]
+		[PSFArgumentCompleter("ResolveEntraID.Provider")]
+		[PSFValidateSet(TabCompletion = "ResolveEntraID.Provider")]
+		[string[]]
+		$Provider,
 
-        [switch]
-        $NoCache
-    )
-    begin {
-        function Write-Result {
-            <#
+		[switch]
+		$NoCache,
+
+		[switch]
+		$NameOnly
+	)
+	begin {
+		function Write-Result {
+			<#
             .SYNOPSIS
             Write the result
-    
+
             .DESCRIPTION
             Write the result in several variants:
             ID, Name (resolved Property), Provider
@@ -76,86 +70,93 @@
 
             The function will also write the result in the cache (IdNameMappingTable), if NoCache isn't set.
             #>
-            [OutputType([string])]
-            [CmdletBinding()]
-            param (
-                [string]
-                $Id,
+			[OutputType([string])]
+			[CmdletBinding()]
+			param (
+				[string]
+				$Id,
 
-                [string]
-                $Provider,
+				[string]
+				$Provider,
 
-                [string]
-                $Value,
+				[string]
+				$Name,
 
-                [switch]
-                $NameOnly,
+				[switch]
+				$NameOnly,
 
-                [switch]
-                $NoCache
-            )
-            $result = [PSCustomObject]@{
-                ID       = $Id
-                Name     = $Value
-                Provider = $Provider
-            }
-            if ($NameOnly) { $Value }
-            else { $result }
+				[switch]
+				$NoCache
+			)
+			$result = [PSCustomObject]@{
+				ID       = $Id
+				Name     = $Name
+				Provider = $Provider
+			}
+			if ($NameOnly) { $Name }
+			else { $result }
 
-            if ($NoCache) { return }
+			if ($NoCache) { return }
 
-            if (-not $script:IdNameMappingTable[$Provider]) {
-                $script:IdNameMappingTable[$Provider] = @{}
-            }
-            $script:IdNameMappingTable[$Provider][$Id] = $result
-        }
-    }
-    process {
-        :main foreach ($entry in $Identity) {
+			if (-not $script:IdNameMappingTable[$Provider]) {
+				$script:IdNameMappingTable[$Provider] = @{}
+			}
+			$script:IdNameMappingTable[$Provider][$Id] = $result
+		}
+	}
+	process {
+		:main foreach ($entry in $Identity) {
 			if ($entry -notmatch '^[a-z0-9]{8}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{12}$') {
-                $entry
-                continue
-            }
-            foreach ($providerName in $Provider) {
-                if ($NoCache) { break }
-                if ($script:IdNameMappingTable[$providerName].$entry) {
-                    Write-Result -Id $entry -Value $script:IdNameMappingTable[$providerName].$entry.Name -NoCache -Provider $providerName -NameOnly:$NameOnly
-                    continue main
-                }
-            }
-            foreach ($providerName in $Provider) {
-                $providerObject = $script:IdentityProvider[$providerName]
-                if (-not $providerObject) {
-                    Write-PSFMessage -Level Error -Message "Could not find identity provider {0}. Please register or check the spelling of the provider. Known providers: {1}" -StringValues $providerName, ((Get-REntraIdentityProvider).Name -join ", ") -Target $providerName
-                    continue
-                }
-                try {
-                    $graphResponse = MiniGraph\Invoke-GraphRequest -Query ($providerObject.QueryToGetName -f $entry) -ErrorAction Stop
-                    if (-not $graphResponse) { continue }
-                    foreach ($propertyName in $providerObject.NameProperty) {
-                        $resolvedName = $graphResponse.$propertyName
-                        if (-not $resolvedName) { continue }
-                        break
-                    }
-                    if (-not $resolvedName) {
-                        $resolvedName = $entry
-                        Write-PSFMessage -Level SomewhatVerbose -Message "{0} of type {1} could be found but failed to resolve the {2}." -StringValues $entry, $providerName, ($providerObject.NameProperty -join ", ") -Target $entry -Tag $providerName
-                    }
-                    Write-Result -Id $entry -Value $resolvedName -Provider $providerName -NameOnly:$NameOnly -NoCache:$NoCache
-                    continue main
-                }
-                catch {
-                    if ($_.ErrorDetails.Message -match '"code":\s*"Request_ResourceNotFound"') {
-                        Write-PSFMessage -Level InternalComment -Message "ID {0} could not found as {1}." -StringValues $entry, $providerName -Target $entry -Tag $providerName -ErrorRecord $_ -OverrideExceptionMessage
-                        continue
-                    }
-                    Write-PSFMessage -Level Error -Message "Error resolving {0}." -StringValues $entry -ErrorRecord $_ -Target $entry -Tag $providerName, "fail" -EnableException $true -PSCmdlet $PSCmdlet
-                }
-            }
-            Write-Result -Id $entry -Value $entry -Provider "Unknown" -NameOnly:$NameOnly -NoCache
-        }
-    }
-    end {
-    
-    }
+				$entry
+				continue
+			}
+			foreach ($providerName in $Provider) {
+				if ($NoCache) { break }
+				if ($script:IdNameMappingTable[$providerName].$entry) {
+					Write-Result -Id $entry -Name $script:IdNameMappingTable[$providerName].$entry.Name -NoCache -Provider $providerName -NameOnly:$NameOnly
+					continue main
+				}
+			}
+			#region iterate over providers
+			:providers foreach ($providerName in $Provider) {
+				$providerObject = $script:IdentityProvider[$providerName]
+				if (-not $providerObject) {
+					Write-PSFMessage -Level Error -Message "Could not find identity provider {0}. Please register or check the spelling of the provider. Known providers: {1}" -StringValues $providerName, ((Get-REntraIdentityProvider).Name -join ", ") -Target $providerName
+					continue
+				}
+
+				foreach ($queryPath in $providerObject.QueryByGuid) {
+					try {
+						$graphResponse = Invoke-EntraRequest -Path ($queryPath -f $entry) -ErrorAction Stop
+					}
+					catch {
+						if ($_.ErrorDetails.Message -match '"code":\s*"Request_ResourceNotFound"') {
+							Write-PSFMessage -Level InternalComment -Message "ID {0} could not found as {1}." -StringValues $entry, $providerName -Target $entry -Tag $providerName -ErrorRecord $_ -OverrideExceptionMessage
+							continue
+						}
+						Write-PSFMessage -Level Error -Message "Error resolving {0}." -StringValues $entry -ErrorRecord $_ -Target $entry -Tag $providerName, "fail" -EnableException $true -PSCmdlet $PSCmdlet
+						continue
+					}
+					if ($graphResponse) { break }
+				}
+				if (-not $graphResponse ) { continue providers }
+
+				foreach ($propertyName in $providerObject.NameProperty) {
+					$resolvedName = $graphResponse.$propertyName
+					if ($resolvedName) { break }
+				}
+				if (-not $resolvedName) {
+					$resolvedName = $entry
+					Write-PSFMessage -Level SomewhatVerbose -Message "{0} of type {1} could be found but failed to resolve the {2}." -StringValues $entry, $providerName, ($providerObject.NameProperty -join ", ") -Target $entry -Tag $providerName
+				}
+				Write-Result -Id $entry -Name $resolvedName -Provider $providerName -NameOnly:$NameOnly -NoCache:$NoCache
+				continue main
+			}
+			#endregion iterate over providers
+			Write-Result -Id $entry -Name $entry -Provider "Unknown" -NameOnly:$NameOnly -NoCache
+		}
+	}
+	end {
+
+	}
 }

@@ -1,35 +1,43 @@
 ﻿function Clear-REntraIdentityCache {
-    <#
+	<#
     .SYNOPSIS
-    Clears the Entra ID identiy cache.
-    
+    Clear Entra ID identiy cache.
+
     .DESCRIPTION
-    Clears the Microsoft Entra ID identiy cache. The cache is used to cache the mapping between the ID and resolved name.
+	Clear Microsoft Entra ID identiy cache.
+	This function will clear the cache of the identity.
 
     .PARAMETER Provider
-    Name(s) of provider, where the cache should be cleared.
-    
-    .EXAMPLE
-    PS C:\> Clear-MeidIdentityCache
-    
-    Clears the Entra ID identiy cache.
+	Provider(s) that should be used to clear the cache.
 
     .EXAMPLE
-    PS C:\> Clear-MeidIdentityCache -Provider "UserUPN", "Group"
-    
-    Clears the Entra ID identiy cache of Providers "UserUPN", "Group".
-    #>
-    [CmdletBinding()]
-    param (
-        [string[]]
-        $Provider
-    )
-    if (-not $Provider) {
-        $script:IdNameMappingTable = @{}
-    }
-    else {
-        foreach ($providerName in $Provider){
-            $script:IdNameMappingTable.Remove($providerName)
-        }
-    }
+	PS C:\> Clear-REntraIdentityCache
+
+	Will clear all cached identities.
+
+	.EXAMPLE
+	PS C:\> Clear-REntraIdentityCache -Provider "User"
+
+	Will clear the cached identities for the provider "User".
+
+	.EXAMPLE
+	PS C:\> Clear-REntraIdentityCache -Provider "User","Group"
+
+	Will clear the cached identities for the providers "User" and "Group".
+	#>
+	[CmdletBinding()]
+	param (
+		[string[]]
+		$Provider
+	)
+	if (-not $Provider) {
+		$script:IdNameMappingTable = @{}
+		$script:NameIdMappingTable = @{}
+	}
+	else {
+		foreach ($providerName in $Provider) {
+			$script:IdNameMappingTable.Remove($providerName)
+			$script:NameIdMappingTable.Remove($providerName)
+		}
+	}
 }

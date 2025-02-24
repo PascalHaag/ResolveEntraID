@@ -1,35 +1,44 @@
 ﻿function Get-REntraIdentityCache {
-    <#
+	<#
     .SYNOPSIS
-    Get the Entra ID identiy cache.
-    
+    Get Entra ID identiy cache.
+
     .DESCRIPTION
-    Get the Microsoft Entra ID identiy cache. The cache is used to cache the mapping between the ID and resolved name.
+	Get Microsoft Entra ID identiy cache.
+	This function will get all cached identities.
 
     .PARAMETER Provider
-    Name(s) of provider
-    
-    .EXAMPLE
-    PS C:\> Get-MeidIdentityCache
-    
-    Get the Entra ID identiy cache.
+	Provider(s) that should be used to get the cache.
 
     .EXAMPLE
-    PS C:\> Get-MeidIdentityCache -Provider "UserUPN", "Group"
-    
-    Get the Entra ID identiy cache of Providers "UserUPN", "Group".
+    PS C:\> Get-REntraIdentityCache
+
+	Will get all cached identities.
+
+	.EXAMPLE
+	PS C:\> Get-REntraIdentityCache -Provider "User"
+
+	Will get the cached identities for the provider "User".
+
+	.EXAMPLE
+	PS C:\> Get-REntraIdentityCache -Provider "User","Group"
+
+	Will get the cached identities for the providers "User" and "Group".
     #>
-    [CmdletBinding()]
-    param (
-        [string[]]
-        $Provider
-    )
-    if (-not $Provider) {
-        $script:IdNameMappingTable
-    }
-    else {
-        foreach ($providerName in $Provider){
-            $script:IdNameMappingTable[$providerName]
-        }
-    }
+	[OutputType([hashtable])]
+	[CmdletBinding()]
+	param (
+		[string[]]
+		$Provider
+	)
+	if (-not $Provider) {
+		$script:IdNameMappingTable
+		$script:NameIdMappingTable
+	}
+	else {
+		foreach ($providerName in $Provider) {
+			$script:IdNameMappingTable[$providerName]
+			$script:NameIdMappingTable[$providerName]
+		}
+	}
 }

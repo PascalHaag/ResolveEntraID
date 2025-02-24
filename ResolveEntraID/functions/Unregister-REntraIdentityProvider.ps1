@@ -1,36 +1,52 @@
 ﻿function Unregister-REntraIdentityProvider {
-    <#
+	<#
     .SYNOPSIS
     Unregister Entra ID identity provider.
-    
+
     .DESCRIPTION
-    Unregister Microsoft Entra ID identity provider.
-    
+	Unregister Microsoft Entra ID identity provider.
+	This function will unregister a provider.
+
     .PARAMETER ProviderName
-    Name of the provider that should be unregistered.
-    
-    .EXAMPLE
-    PS C:\> Unregister-MeidIdentityProvider -Name "UserUPN"
+	Name(s) of the Entra ID identity provider.
 
-    Will unregister a provider with name "UserUPN".
+	.EXAMPLE
+	PS C:\> Get-REntraIdentityProvider -ProviderName "*"
 
-    .EXAMPLE
-    PS C:\> Unregister-MeidIdentityProvider -Name "UserUPN", "Groups"
+	Will unregister all providers.
 
-    Will unregister a provider with name "UserUPN" and "Groups".
+	.EXAMPLE
+    PS C:\> Unregister-REntraIdentityProvider -ProviderName "User"
+
+	Will unregister the provider with name "User".
+
+	.EXAMPLE
+	PS C:\> Unregister-REntraIdentityProvider -ProviderName "User","Group"
+
+	Will unregister the providers with name "User" and "Group".
+
+	.EXAMPLE
+	PS C:\> Get-REntraIdentityProvider -ProviderName "User*"
+
+	Will unregister all providers with name starting with "User".
+
+	.EXAMPLE
+	PS C:\> "User" | Unregister-REntraIdentityProvider
+
+	Will unregister the provider with name "User".
     #>
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
-        [PSFArgumentCompleter("ResolveEntraID.Provider")]
-        [PSFValidateSet(TabCompletion = "ResolveEntraID.Provider")]
-        [string[]]
-        $ProviderName
-    )
-    process {
-        foreach ($entry in $ProviderName ){
-            Clear-REntraIdentityCache -Provider $entry
-            $script:IdentityProvider.Remove($entry)
-        }
-    }
+	[CmdletBinding()]
+	param (
+		[Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]
+		[PSFArgumentCompleter("ResolveEntraID.Provider")]
+		[PSFValidateSet(TabCompletion = "ResolveEntraID.Provider")]
+		[string[]]
+		$ProviderName
+	)
+	process {
+		foreach ($entry in $ProviderName ) {
+			Clear-REntraIdentityCache -Provider $entry
+			$script:IdentityProvider.Remove($entry)
+		}
+	}
 }
