@@ -66,6 +66,7 @@
 	Will resolve the ID "<ID>" with defined property in the provider "UserUPN".
 	The written output is ID, Name (Property), Provider and the result will be written in the cache.
     #>
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', ('Provider','NoCache', 'NameOnly') , Justification = 'Provider, NoCache and NameOnly are used in the function, in a steppable pipeline and should not be suppressed.')]
 	[CmdletBinding()]
 	param (
 		[Parameter(Mandatory, ValueFromPipeline, ValueFromPipelineByPropertyName)]

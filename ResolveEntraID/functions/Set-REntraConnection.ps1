@@ -14,6 +14,7 @@
 
 	Will set the default service for Invoke-EntraRequest to "ResolveEntraGraph"
 	#>
+	[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '')]
 	[CmdletBinding()]
 	param (
 		[Parameter(Mandatory)]

@@ -15,6 +15,9 @@
 	.PARAMETER NoCache
 	Option that no Cache will be created. ID(s) with the mapping property will not be cached.
 
+	.PARAMETER NameOnly
+	Option that only show the resolved Name.
+
 	.EXAMPLE
 	PS C:\> ConvertTo-REntraName -Identity "<GUID>" -Provider UserUPN
 
