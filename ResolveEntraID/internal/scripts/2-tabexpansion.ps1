@@ -6,3 +6,12 @@
         }
     }
 }
+
+Register-PSFTeppScriptblock -Name ResolveEntraID.EntraService -ScriptBlock {
+	foreach ($service in Get-EntraService){
+		@{
+			Text = $service.Name
+			ToolTip = "{0} --> ServiceUrl: {1}" -f $service.Name, $service.ServiceUrl
+		}
+	}
+}
