@@ -90,16 +90,20 @@
 
 		[Alias("IdOnly")]
 		[switch]
-		$NameOnly
+		$NameOnly,
+
+		[hashtable]
+        $ServiceMap = @{}
 	)
 	begin {
-		Assert-EntraConnection -Cmdlet $PSCmdLet -Service $Script:PSDefaultParameterValues["Invoke-EntraRequest:Service"]
+		$services = $script:_serviceSelector.GetServiceMap($ServiceMap)
+		Assert-EntraConnection -Cmdlet $PSCmdLet -Service $services.ResolveEntraGraph
 		# GetSteppablePipeline is used to create a portable pipeline, that allows pausing and resuming the enclosed command as needed.
 		# Effectively this means, the wrapped command will only be run once, no matter the numbers of input ids.
 		# This significantly improves performance.
 		$command = switch ($ResultType) {
-			"Name" { { ConvertTo-REntraName -Provider $Provider -NoCache:$NoCache -NameOnly:$NameOnly }.GetSteppablePipeline() }
-			"ID" { { ConvertTo-REntraGUID -Provider $Provider -NoCache:$NoCache -IdOnly:$NameOnly }.GetSteppablePipeline() }
+			"Name" { { ConvertTo-REntraName -Provider $Provider -NoCache:$NoCache -NameOnly:$NameOnly -ServiceMap $services -WarningAction $WarningPreference}.GetSteppablePipeline() }
+			"ID" { { ConvertTo-REntraGUID -Provider $Provider -NoCache:$NoCache -IdOnly:$NameOnly -ServiceMap $services -WarningAction $WarningPreference}.GetSteppablePipeline() }
 		}
 		$command.begin($true)
 	}

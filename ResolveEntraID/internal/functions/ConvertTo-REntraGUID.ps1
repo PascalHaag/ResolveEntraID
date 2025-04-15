@@ -56,7 +56,10 @@
 		$NoCache,
 
 		[switch]
-		$IdOnly
+		$IdOnly,
+
+		[hashtable]
+		$ServiceMap
 	)
 	begin {
 		function Write-Result {
@@ -128,14 +131,14 @@
 				# Resolve provider to use
 				$providerObject = $script:IdentityProvider[$providerName]
 				if (-not $providerObject) {
-					Write-PSFMessage -Level Error -Message "Could not find identity provider {0}. Please register or check the spelling of the provider. Known providers: {1}" -StringValues $providerObject.Name, ((Get-MeidIdentityProvider).Name -join ", ") -Target $providerObject.Name
+					Write-PSFMessage -Level Error -Message "Could not find identity provider {0}. Please register or check the spelling of the provider. Known providers: {1}" -StringValues $providerObject.Name, ((Get-REntraIdentityProvider).Name -join ", ") -Target $providerObject.Name
 					continue
 				}
 
 				# Resolve identities
 				foreach ($queryPath in $providerObject.QueryByName) {
 					try {
-						$graphResponse = Invoke-EntraRequest -Path ($queryPath -f $entry) -ErrorAction Stop
+						$graphResponse = Invoke-EntraRequest -Path ($queryPath -f $entry) -Service $ServiceMap.ResolveEntraGraph -ErrorAction Stop
 					}
 					catch {
 						if ($_.ErrorDetails.Message -match '"code":\s*"Request_ResourceNotFound"') {

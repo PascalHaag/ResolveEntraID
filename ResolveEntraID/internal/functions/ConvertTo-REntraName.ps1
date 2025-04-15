@@ -56,7 +56,10 @@
 		$NoCache,
 
 		[switch]
-		$NameOnly
+		$NameOnly,
+
+		[hashtable]
+		$ServiceMap
 	)
 	begin {
 		function Write-Result {
@@ -130,7 +133,7 @@
 
 				foreach ($queryPath in $providerObject.QueryByGuid) {
 					try {
-						$graphResponse = Invoke-EntraRequest -Path ($queryPath -f $entry) -ErrorAction Stop
+						$graphResponse = Invoke-EntraRequest -Path ($queryPath -f $entry) -Service $ServiceMap.ResolveEntraGraph -ErrorAction Stop
 					}
 					catch {
 						if ($_.ErrorDetails.Message -match '"code":\s*"Request_ResourceNotFound"') {
