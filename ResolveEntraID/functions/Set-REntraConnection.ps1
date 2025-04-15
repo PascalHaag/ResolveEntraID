@@ -24,6 +24,6 @@
 		$Name
 	)
 	process {
-		$Script:PSDefaultParameterValues["Invoke-EntraRequest:Service"] = $Name
+		$script:_Service.ResolveEntraGraph = $Name
 	}
 }
