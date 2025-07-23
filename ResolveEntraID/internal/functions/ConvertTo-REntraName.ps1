@@ -133,14 +133,18 @@
 
 				foreach ($queryPath in $providerObject.QueryByGuid) {
 					try {
-						$graphResponse = Invoke-EntraRequest -Path ($queryPath -f $entry) -Service $ServiceMap.ResolveEntraGraph -ErrorAction Stop
+						$entraWarning = $null
+						$graphResponse = Invoke-EntraRequest -Path ($queryPath -f $entry) -Service $ServiceMap.ResolveEntraGraph -ErrorAction Stop -WarningAction SilentlyContinue -WarningVariable entraWarning
 					}
 					catch {
+						if ($entraWarning) {
+							Write-PSFMessage -Level Verbose -Message $entraWarning[0] -Tag $providerObject.Name -Target $entry -FunctionName "Resolve-REntraIdentity"
+						}
 						if ($_.ErrorDetails.Message -match '"code":\s*"Request_ResourceNotFound"') {
-							Write-PSFMessage -Level InternalComment -Message "ID {0} could not found as {1}." -StringValues $entry, $providerName -Target $entry -Tag $providerName -ErrorRecord $_ -OverrideExceptionMessage
+							Write-PSFMessage -Level InternalComment -Message "ID {0} could not found as {1}." -StringValues $entry, $providerObject.Name -Target $entry -Tag $providerObject.Name -ErrorRecord $_ -OverrideExceptionMessage
 							continue
 						}
-						Write-PSFMessage -Level Error -Message "Error resolving {0}." -StringValues $entry -ErrorRecord $_ -Target $entry -Tag $providerName, "fail" -EnableException $true -PSCmdlet $PSCmdlet
+						Write-PSFMessage -Level Error -Message "Error resolving {0} as provider {1} on query {2}." -StringValues $entry, $providerObject.Name, $queryPath -ErrorRecord $_ -Target $entry -Tag $providerObject.Name, "fail" -EnableException $true -PSCmdlet $PSCmdlet -FunctionName "Resolve-REntraIdentity"
 						continue
 					}
 					if ($graphResponse) { break }
