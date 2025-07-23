@@ -13,7 +13,7 @@ Install-Module ResolveEntraID -Scope CurrentUser
 ```
 
 ```powershell
-Install-PSResorce ResolveEntraID -Scope CurrentUser
+Install-PSResource ResolveEntraID -Scope CurrentUser
 ```
 
 ## Register Identity Provider
@@ -36,6 +36,7 @@ Unregister-REntraIdentityProvider -ProviderName "Group"
 # Get all providers.
 Get-REntraIdentityProvider
 ```
+
 ```powershell
 # Get all providers with name containing "User".
 Get-REntraIdentityProvider -ProviderName "*User*"
@@ -55,6 +56,7 @@ Resolve-REntraIdentity -Identity "<ID>","<ID2>" -Provider UserUPN,Group
 # Clears the Entra ID identiy cache.
 Clear-REntraIdentityCache
 ```
+
 ```powershell
 # Clears the cached identities for the providers "Group".
 Clear-REntraIdentityCache -Provider "Group"
